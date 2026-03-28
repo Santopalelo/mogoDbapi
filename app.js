@@ -16,18 +16,21 @@ connectDB();
 
 app.use(logRequest);
 
-app.get('/todos', async (req, res, next) => {
-  const todos = await Todo.find({});
-  res.status(200).json(todos);
-});
+app.get("/todos", async (req, res) => {
+    try {
+        const { completed } = req.query;
 
-app.get('/todos/completed', async (req, res, next) => {
-  try {
-    const completed = await Todo.find({ completed: true });
-    res.json(completed); // Custom Read!
-  } catch (error) {
-    next(error);
-  }
+        let filter = {};
+
+        if (completed !== undefined) {
+            filter.completed = completed === "true";
+        }
+
+        const todos = await Todo.find(filter);
+        res.json(todos);
+    } catch (error) {
+        next(error);
+    }
 });
 
 app.get('/todos/:id', async (req, res, next) => {
